@@ -7,15 +7,17 @@ interface Filters {
   semester: string;
   type: string;
   status: string;
+  subjectId: string;
 }
 
 interface ResourceFiltersProps {
   filters: Filters;
   setFilters: (filters: Filters) => void;
   role: string;
+  hideGlobalFilters?: boolean;
 }
 
-export const ResourceFilters: React.FC<ResourceFiltersProps> = ({ filters, setFilters, role }) => {
+export const ResourceFilters: React.FC<ResourceFiltersProps> = ({ filters, setFilters, role, hideGlobalFilters }) => {
   const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setFilters({
       ...filters,
@@ -25,43 +27,47 @@ export const ResourceFilters: React.FC<ResourceFiltersProps> = ({ filters, setFi
 
   return (
     <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 mb-6 flex flex-wrap gap-4 items-end">
-      <div className="flex flex-col gap-1 w-full sm:w-auto">
-        <label className="text-xs font-semibold text-gray-500 uppercase">Department</label>
-        <select 
-          name="department" 
-          value={filters.department} 
-          onChange={handleChange}
-          className="border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-indigo-500"
-        >
-          <option value="">All Departments</option>
-          <option value="CSE">CSE</option>
-          <option value="ECE">ECE</option>
-          <option value="EEE">EEE</option>
-          <option value="MECH">MECH</option>
-          <option value="CIVIL">CIVIL</option>
-          <option value="IT">IT</option>
-        </select>
-      </div>
+      {!hideGlobalFilters && (
+        <>
+          <div className="flex flex-col gap-1 w-full sm:w-auto">
+            <label className="text-xs font-semibold text-gray-500 uppercase">Department</label>
+            <select 
+              name="department" 
+              value={filters.department} 
+              onChange={handleChange}
+              className="border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-indigo-500"
+            >
+              <option value="">All Departments</option>
+              <option value="CSE">CSE</option>
+              <option value="ECE">ECE</option>
+              <option value="EEE">EEE</option>
+              <option value="MECH">MECH</option>
+              <option value="CIVIL">CIVIL</option>
+              <option value="IT">IT</option>
+            </select>
+          </div>
 
-      <div className="flex flex-col gap-1 w-full sm:w-auto">
-        <label className="text-xs font-semibold text-gray-500 uppercase">Semester</label>
-        <select 
-          name="semester" 
-          value={filters.semester} 
-          onChange={handleChange}
-          className="border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-indigo-500"
-        >
-          <option value="">All Semesters</option>
-          <option value="SEM1">Semester 1</option>
-          <option value="SEM2">Semester 2</option>
-          <option value="SEM3">Semester 3</option>
-          <option value="SEM4">Semester 4</option>
-          <option value="SEM5">Semester 5</option>
-          <option value="SEM6">Semester 6</option>
-          <option value="SEM7">Semester 7</option>
-          <option value="SEM8">Semester 8</option>
-        </select>
-      </div>
+          <div className="flex flex-col gap-1 w-full sm:w-auto">
+            <label className="text-xs font-semibold text-gray-500 uppercase">Semester</label>
+            <select 
+              name="semester" 
+              value={filters.semester} 
+              onChange={handleChange}
+              className="border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-indigo-500"
+            >
+              <option value="">All Semesters</option>
+              <option value="SEM1">Semester 1</option>
+              <option value="SEM2">Semester 2</option>
+              <option value="SEM3">Semester 3</option>
+              <option value="SEM4">Semester 4</option>
+              <option value="SEM5">Semester 5</option>
+              <option value="SEM6">Semester 6</option>
+              <option value="SEM7">Semester 7</option>
+              <option value="SEM8">Semester 8</option>
+            </select>
+          </div>
+        </>
+      )}
 
       <div className="flex flex-col gap-1 w-full sm:w-auto">
         <label className="text-xs font-semibold text-gray-500 uppercase">Type</label>

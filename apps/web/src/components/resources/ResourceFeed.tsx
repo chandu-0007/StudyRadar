@@ -6,7 +6,15 @@ import { ResourceFilters } from './ResourceFilters';
 import { useUser } from '../../context/UserContext';
 import { Loader2 } from 'lucide-react';
 
-export const ResourceFeed = () => {
+export const ResourceFeed = ({ 
+  initialSubjectId, 
+  initialStatus,
+  hideGlobalFilters = false
+}: { 
+  initialSubjectId?: string; 
+  initialStatus?: string;
+  hideGlobalFilters?: boolean;
+}) => {
   const { user } = useUser();
   const [resources, setResources] = useState<ResourceItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -16,7 +24,8 @@ export const ResourceFeed = () => {
     department: '',
     semester: '',
     type: '',
-    status: user?.role === 'TEACHER' ? '' : 'APPROVED', // students only see APPROVED by default
+    status: initialStatus !== undefined ? initialStatus : (user?.role === 'TEACHER' ? '' : 'APPROVED'), // students only see APPROVED by default
+    subjectId: initialSubjectId || ''
   });
 
   const [page, setPage] = useState(1);
@@ -38,6 +47,7 @@ export const ResourceFeed = () => {
         ...(filters.department && { department: filters.department }),
         ...(filters.semester && { semester: filters.semester }),
         ...(filters.type && { type: filters.type }),
+        ...(filters.subjectId && { subjectId: filters.subjectId }),
         ...(filters.status && { status: filters.status }),
       });
 
@@ -119,7 +129,12 @@ export const ResourceFeed = () => {
 
   return (
     <div className="w-full">
-      <ResourceFilters filters={filters} setFilters={setFilters} role={user.role || 'STUDENT'} />
+      <ResourceFilters 
+        filters={filters} 
+        setFilters={setFilters} 
+        role={user.role || 'STUDENT'} 
+        hideGlobalFilters={hideGlobalFilters}
+      />
       
       {error && (
         <div className="bg-red-50 text-red-700 p-4 border border-red-200 rounded-xl mb-6">

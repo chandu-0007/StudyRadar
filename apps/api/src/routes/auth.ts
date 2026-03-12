@@ -15,7 +15,11 @@ const signupSchema = z.object({
   college: z.string().min(2, "College name is required"),
   department: z.enum(["CSE", "ECE", "EEE", "MECH", "CIVIL", "IT"]),
   graduationYear: z.number().int().min(2000).max(2100),
-  currentSem: z.enum(["SEM1", "SEM2", "SEM3", "SEM4", "SEM5", "SEM6", "SEM7", "SEM8"])
+  currentSem: z.enum(["SEM1", "SEM2", "SEM3", "SEM4", "SEM5", "SEM6", "SEM7", "SEM8"]),
+  role: z.enum(["STUDENT", "TEACHER", "ADMIN"]).optional(),
+  linkedin: z.string().optional(),
+  github: z.string().optional(),
+  bio: z.string().optional()
 });
 
 router.post("/signup", async (req: Request, res: Response): Promise<void> => {
@@ -62,6 +66,10 @@ router.post("/signup", async (req: Request, res: Response): Promise<void> => {
         department: data.department,
         graduationYear: data.graduationYear,
         currentSem: data.currentSem,
+        role: (data.role as any) || "STUDENT",
+        linkedin: data.linkedin,
+        github: data.github,
+        bio: data.bio
       },
     });
 

@@ -8,7 +8,8 @@ import {
   UploadCloud, 
   Files, 
   Bookmark, 
-  User 
+  User,
+  BarChart3
 } from 'lucide-react';
 import { SidebarSection } from './SidebarSection';
 import { SidebarItem } from './SidebarItem';
@@ -49,6 +50,13 @@ export const Sidebar: React.FC<SidebarProps> = ({ role }) => {
           )}
           <SidebarItem href="/dashboard/profile" label="Profile" icon={User} />
         </SidebarSection>
+
+        {role === 'TEACHER' && (
+          <SidebarSection title="Admin">
+            <SidebarItem href="/dashboard/admin/subjects" label="Manage Subjects" icon={BookOpen} />
+            <SidebarItem href="/dashboard/teacher/analytics" label="Analytics" icon={BarChart3} />
+          </SidebarSection>
+        )}
       </div>
     </aside>
   );

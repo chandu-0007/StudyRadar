@@ -35,20 +35,36 @@ export const UploadForm = () => {
   });
 
   useEffect(() => {
-    // Fetch subjects dynamically
     const fetchSubjects = async () => {
       try {
-        const response = await fetch('http://localhost:5000/api/subjects');
+        if (!formData.semester) return;
+        
+        // Pass semester and department context so student only sees their relevant courses 
+        // Note: For full restriction, we can pull user's department from UserContext
+        const dept = user?.department || 'CSE';
+        
+        const response = await fetch(`http://localhost:5000/api/subjects?semester=${formData.semester}&department=${dept}`);
         const data = await response.json();
+        
         if (data.success && data.subjects) {
           setSubjects(data.subjects);
+          
+          // Reset Selected SubjectID completely if existing subject isn't available in new semester options
+          if (data.subjects.length > 0) {
+            const stillExists = data.subjects.some((s: Subject) => s.id === formData.subjectId);
+            if (!stillExists) {
+              setFormData(prev => ({ ...prev, subjectId: '' }));
+            }
+          } else {
+             setFormData(prev => ({ ...prev, subjectId: '' }));
+          }
         }
       } catch (err) {
         console.error("Failed to fetch subjects:", err);
       }
     };
     fetchSubjects();
-  }, []);
+  }, [formData.semester, user?.department]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -187,10 +203,13 @@ export const UploadForm = () => {
               name="subjectId" 
               value={formData.subjectId} 
               onChange={handleChange}
-              className="w-full border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-white px-4 py-2"
+              disabled={subjects.length === 0}
+              className="w-full border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-white px-4 py-2 disabled:opacity-50 disabled:bg-gray-100"
               required
             >
-              <option value="" disabled>Select a Subject</option>
+              <option value="" disabled>
+                {subjects.length === 0 ? "No subjects available for this semester" : "Select a Subject"}
+              </option>
               {subjects.map(sub => (
                 <option key={sub.id} value={sub.id}>{sub.code} - {sub.name}</option>
               ))}

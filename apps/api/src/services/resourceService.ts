@@ -113,8 +113,9 @@ export class ResourceService {
     await prisma.resource.delete({ where: { id } });
 
     // Delete from Cloudinary
-    if (resource.publicId) {
-      await cloudinary.uploader.destroy(resource.publicId).catch(console.error);
+    const resAny = resource as any;
+    if (resAny.publicId) {
+      await cloudinary.uploader.destroy(resAny.publicId).catch(console.error);
     }
 
     return true;
