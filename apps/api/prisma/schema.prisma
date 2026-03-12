@@ -7,9 +7,185 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-//////////////////////////////////////////////////
-// ENUMS
-//////////////////////////////////////////////////
+model User {
+  id             String            @id @default(uuid())
+  username       String            @unique
+  email          String            @unique
+  password       String
+  college        String
+  department     Department
+  graduationYear Int
+  currentSem     Semester
+  profileImage   String?
+  bio            String?
+  linkedin       String?
+  github         String?
+  role           Role              @default(STUDENT)
+  verified       Boolean           @default(false)
+  reputation     Int               @default(0)
+  uploadsCount   Int               @default(0)
+  isSenior       Boolean           @default(false)
+  lastLogin      DateTime?
+  createdAt      DateTime          @default(now())
+  updatedAt      DateTime          @updatedAt
+  deletedAt      DateTime?
+  aiSearchLogs   AISearchLog[]
+  bookmarks      Bookmark[]
+  comments       Comment[]
+  downloads      DownloadHistory[]
+  notifications  Notification[]
+  ratings        Rating[]
+  resources      Resource[]
+  searchHistory  SearchHistory[]
+  messages  Message[]
+
+  @@index([college])
+  @@index([department])
+}
+
+model Subject {
+  id          String     @id @default(uuid())
+  name        String
+  code        String
+  department  Department
+  semester    Semester
+  description String?
+  icon        String?
+  createdAt   DateTime   @default(now())
+  resources   Resource[]
+
+  @@unique([code, department])
+}
+
+model Resource {
+  id            String            @id @default(uuid())
+  title         String
+  description   String?
+  fileUrl       String
+  fileType      FileType
+  mimeType      String?
+  fileSize      Int?
+  contentText   String?
+  type          ResourceType
+  semester      Semester
+  department    Department
+  unit          Int?
+  year          Int?
+  syllabusMatch Boolean           @default(true)
+  avgRating     Float             @default(0)
+  viewCount     Int               @default(0)
+  downloadCount Int               @default(0)
+  isAdminPick   Boolean           @default(false)
+  status        ResourceStatus    @default(PENDING)
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+  deletedAt     DateTime?
+  subjectId     String
+  userId        String
+  examType      ExamType?
+  publicId      String
+  examDate      String?
+  bookmarks     Bookmark[]
+  comments      Comment[]
+  downloads     DownloadHistory[]
+  ratings       Rating[]
+  subject       Subject           @relation(fields: [subjectId], references: [id])
+  uploadedBy    User              @relation(fields: [userId], references: [id])
+  tags          ResourceTag[]
+
+  @@index([subjectId])
+  @@index([department, semester])
+  @@index([type])
+  @@index([avgRating])
+}
+
+model Tag {
+  id        String        @id @default(uuid())
+  name      String        @unique
+  resources ResourceTag[]
+}
+
+model ResourceTag {
+  resourceId String
+  tagId      String
+  resource   Resource @relation(fields: [resourceId], references: [id])
+  tag        Tag      @relation(fields: [tagId], references: [id])
+
+  @@id([resourceId, tagId])
+}
+
+model Rating {
+  id         String   @id @default(uuid())
+  score      Int
+  review     String?
+  createdAt  DateTime @default(now())
+  userId     String
+  resourceId String
+  resource   Resource @relation(fields: [resourceId], references: [id])
+  user       User     @relation(fields: [userId], references: [id])
+
+  @@unique([userId, resourceId])
+}
+
+model Bookmark {
+  id         String   @id @default(uuid())
+  createdAt  DateTime @default(now())
+  userId     String
+  resourceId String
+  resource   Resource @relation(fields: [resourceId], references: [id])
+  user       User     @relation(fields: [userId], references: [id])
+
+  @@unique([userId, resourceId])
+}
+
+model Comment {
+  id         String   @id @default(uuid())
+  text       String
+  createdAt  DateTime @default(now())
+  userId     String
+  resourceId String
+  resource   Resource @relation(fields: [resourceId], references: [id])
+  user       User     @relation(fields: [userId], references: [id])
+}
+
+model DownloadHistory {
+  id         String   @id @default(uuid())
+  createdAt  DateTime @default(now())
+  userId     String
+  resourceId String
+  resource   Resource @relation(fields: [resourceId], references: [id])
+  user       User     @relation(fields: [userId], references: [id])
+}
+
+model SearchHistory {
+  id        String   @id @default(uuid())
+  query     String
+  filters   Json?
+  createdAt DateTime @default(now())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+}
+
+model AISearchLog {
+  id        String   @id @default(uuid())
+  query     String
+  subjectId String
+  response  String?
+  createdAt DateTime @default(now())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+}
+
+model Notification {
+  id        String           @id @default(uuid())
+  type      NotificationType
+  title     String
+  message   String
+  isRead    Boolean          @default(false)
+  createdAt DateTime         @default(now())
+  userId    String
+  user      User             @relation(fields: [userId], references: [id])
+}
 
 enum Role {
   STUDENT
@@ -77,281 +253,23 @@ enum NotificationType {
   SYSTEM
 }
 
-//////////////////////////////////////////////////
-// USER
-//////////////////////////////////////////////////
-
-model User {
-  id       String @id @default(uuid())
-  username String @unique
-  email    String @unique
-  password String
-
-  college        String
-  department     Department
-  graduationYear Int
-  currentSem     Semester
-
-  profileImage String?
-  bio          String?
-
-  linkedin String?
-  github   String?
-
-  role     Role    @default(STUDENT)
-  verified Boolean @default(false)
-
-  reputation   Int @default(0)
-  uploadsCount Int @default(0)
-
-  isSenior Boolean @default(false)
-
-  lastLogin DateTime?
-
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  deletedAt DateTime?
-
-  resources     Resource[]
-  bookmarks     Bookmark[]
-  ratings       Rating[]
-  comments      Comment[]
-  notifications Notification[]
-
-  searchHistory SearchHistory[]
-  aiSearchLogs  AISearchLog[]
-  downloads     DownloadHistory[]
-
-  @@index([college])
-  @@index([department])
-}
-
-//////////////////////////////////////////////////
-// SUBJECT
-//////////////////////////////////////////////////
-
-model Subject {
-  id         String     @id @default(uuid())
-  name       String
-  code       String
-  department Department
-  semester   Semester
-
-  description String?
-  icon        String?
-
+model Room {
+  id        String   @id @default(uuid())
+  name      String
+  subjectId String?
   createdAt DateTime @default(now())
-
-  resources Resource[]
-
-  @@unique([code, department])
+  messages  Message[]
 }
 
-//////////////////////////////////////////////////
-// RESOURCE
-//////////////////////////////////////////////////
-
-model Resource {
-  id String @id @default(uuid())
-
-  title       String
-  description String?
-
-  fileUrl  String
-  publicId String
-  fileType FileType
-  mimeType String?
-  fileSize Int? // bytes
-
-  // AI ready
-  contentText String?
-
-  // classification
-  type       ResourceType
-  semester   Semester
-  department Department
-  unit       Int?
-  year       Int?
-  examDate   String?
-  examType   ExamType?
-
-  syllabusMatch Boolean @default(true)
-
-  // ranking
-  avgRating     Float @default(0)
-  viewCount     Int   @default(0)
-  downloadCount Int   @default(0)
-
-  isAdminPick Boolean @default(false)
-
-  status ResourceStatus @default(PENDING)
-
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  deletedAt DateTime?
-
-  // relations
-  subject   Subject @relation(fields: [subjectId], references: [id])
-  subjectId String
-
-  uploadedBy User   @relation(fields: [userId], references: [id])
-  userId     String
-
-  ratings   Rating[]
-  bookmarks Bookmark[]
-  comments  Comment[]
-  tags      ResourceTag[]
-  downloads DownloadHistory[]
-
-  @@index([subjectId])
-  @@index([department, semester])
-  @@index([type])
-  @@index([avgRating])
-}
-
-//////////////////////////////////////////////////
-// TAGS
-//////////////////////////////////////////////////
-
-model Tag {
-  id   String @id @default(uuid())
-  name String @unique
-
-  resources ResourceTag[]
-}
-
-model ResourceTag {
-  resource   Resource @relation(fields: [resourceId], references: [id])
-  resourceId String
-
-  tag   Tag    @relation(fields: [tagId], references: [id])
-  tagId String
-
-  @@id([resourceId, tagId])
-}
-
-//////////////////////////////////////////////////
-// RATINGS
-//////////////////////////////////////////////////
-
-model Rating {
-  id String @id @default(uuid())
-
-  score  Int
-  review String?
-
+model Message {
+  id        String   @id @default(uuid())
+  text      String?
+  imageUrl  String?
   createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+  room      Room     @relation(fields: [roomId], references: [id])
+  roomId    String
 
-  user   User   @relation(fields: [userId], references: [id])
-  userId String
-
-  resource   Resource @relation(fields: [resourceId], references: [id])
-  resourceId String
-
-  @@unique([userId, resourceId])
-}
-
-//////////////////////////////////////////////////
-// BOOKMARKS
-//////////////////////////////////////////////////
-
-model Bookmark {
-  id String @id @default(uuid())
-
-  createdAt DateTime @default(now())
-
-  user   User   @relation(fields: [userId], references: [id])
-  userId String
-
-  resource   Resource @relation(fields: [resourceId], references: [id])
-  resourceId String
-
-  @@unique([userId, resourceId])
-}
-
-//////////////////////////////////////////////////
-// COMMENTS
-//////////////////////////////////////////////////
-
-model Comment {
-  id String @id @default(uuid())
-
-  text String
-
-  createdAt DateTime @default(now())
-
-  user   User   @relation(fields: [userId], references: [id])
-  userId String
-
-  resource   Resource @relation(fields: [resourceId], references: [id])
-  resourceId String
-}
-
-//////////////////////////////////////////////////
-// DOWNLOAD HISTORY
-//////////////////////////////////////////////////
-
-model DownloadHistory {
-  id String @id @default(uuid())
-
-  createdAt DateTime @default(now())
-
-  user   User   @relation(fields: [userId], references: [id])
-  userId String
-
-  resource   Resource @relation(fields: [resourceId], references: [id])
-  resourceId String
-}
-
-//////////////////////////////////////////////////
-// SEARCH HISTORY
-//////////////////////////////////////////////////
-
-model SearchHistory {
-  id String @id @default(uuid())
-
-  query   String
-  filters Json?
-
-  createdAt DateTime @default(now())
-
-  user   User   @relation(fields: [userId], references: [id])
-  userId String
-}
-
-//////////////////////////////////////////////////
-// AI SEARCH LOG
-//////////////////////////////////////////////////
-
-model AISearchLog {
-  id String @id @default(uuid())
-
-  query     String
-  subjectId String
-  response  String?
-
-  createdAt DateTime @default(now())
-
-  user   User   @relation(fields: [userId], references: [id])
-  userId String
-}
-
-//////////////////////////////////////////////////
-// NOTIFICATIONS
-//////////////////////////////////////////////////
-
-model Notification {
-  id String @id @default(uuid())
-
-  type NotificationType
-
-  title   String
-  message String
-
-  isRead Boolean @default(false)
-
-  createdAt DateTime @default(now())
-
-  user   User   @relation(fields: [userId], references: [id])
-  userId String
+  @@index([roomId, createdAt])
 }
