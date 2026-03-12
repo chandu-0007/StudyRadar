@@ -13,8 +13,7 @@ datasource db {
 
 enum Role {
   STUDENT
-  SENIOR
-  MODERATOR
+  TEACHER
   ADMIN
 }
 
@@ -56,6 +55,11 @@ enum FileType {
   DOC
   VIDEO
   LINK
+}
+
+enum ExamType {
+  MID_SEM
+  END_SEM
 }
 
 enum ResourceStatus {
@@ -154,6 +158,7 @@ model Resource {
   description String?
 
   fileUrl  String
+  publicId String
   fileType FileType
   mimeType String?
   fileSize Int? // bytes
@@ -167,6 +172,8 @@ model Resource {
   department Department
   unit       Int?
   year       Int?
+  examYear   Int?
+  examType   ExamType?
 
   syllabusMatch Boolean @default(true)
 
