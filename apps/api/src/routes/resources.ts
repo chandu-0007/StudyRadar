@@ -1,34 +1,36 @@
 import { Router } from "express";
-import { AuthRequest, requireAuth } from "../middleware/auth";
+import { requireAuth } from "../middleware/auth";
 import upload from "../middleware/upload";
-import * as resourceController from "../controllers/resourceController";
+import { ResourceController } from "../controllers/resourceController";
 
 const router = Router();
 
-// GET all resources with filtering and pagination
-router.get("/", requireAuth, resourceController.getResources);
+// GET /api/resources
+// Get all resources with filtering and pagination
+router.get("/", requireAuth, ResourceController.getResources);
 
-// UPLOAD RESOURCE API
-router.post(
-  "/upload",
-  requireAuth,
-  upload.single("file"),
-  resourceController.uploadResource
-);
+// GET /api/resources/:id
+// Get a single resource with all metadata (comments, tags, ratings)
+router.get("/:id", requireAuth, ResourceController.getResourceById);
 
-// GET a single resource by ID
-router.get("/:id", requireAuth, resourceController.getResourceById);
+// POST /api/resources/upload
+// Upload a new resource
+router.post("/upload", requireAuth, upload.single("file"), ResourceController.upload);
 
-// DELETE RESOURCE API
-router.delete("/:id", requireAuth, resourceController.deleteResource);
+// GET /api/resources/:id/download
+// Download a resource and track download count
+router.get("/:id/download", requireAuth, ResourceController.downloadResource);
 
-// DOWNLOAD RESOURCE API
-router.get("/:id/download", requireAuth, resourceController.downloadResource);
+// DELETE /api/resources/:id
+// Delete a resource 
+router.delete("/:id", requireAuth, ResourceController.deleteResource);
 
-// APPROVE RESOURCE API
-router.patch("/:id/approve", requireAuth, resourceController.approveResource);
+// POST /api/resources/:id/report
+// Flag a resource as inappropriate/incorrect
+router.post("/:id/report", requireAuth, ResourceController.reportResource);
 
-// REPORT RESOURCE API
-router.post("/:id/report", requireAuth, resourceController.reportResource);
+// PATCH /api/resources/:id/approve
+// Approve a pending resource
+router.patch("/:id/approve", requireAuth, ResourceController.approveResource);
 
 export default router;
