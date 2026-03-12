@@ -71,11 +71,17 @@ export const SignupStepper = () => {
         throw new Error(data.message || 'Signup failed. Please check your data.');
       }
 
-      if (data.token) {
+      if (data.token && data.user) {
+        // Technically signup backend logic doesn't return a token right now,
+        // but if it ever does, this handles it.
         localStorage.setItem('token', data.token);
+        localStorage.setItem('user', JSON.stringify(data.user));
+        router.push('/dashboard');
+      } else {
+        // Since no token is provided after signup in the current backend API, 
+        // cleanly push them back to the login screen to perform a real authentication!
+        router.push('/login');
       }
-
-      router.push('/dashboard');
     } catch (err: any) {
       setApiError(err.message || 'An error occurred during signup.');
       setIsLoading(false);

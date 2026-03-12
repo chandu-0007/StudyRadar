@@ -4,9 +4,11 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Input } from '../ui/Input';
 import { Button } from '../ui/Button';
+import { useUser } from '../../context/UserContext';
 
 export const LoginForm = () => {
   const router = useRouter();
+  const { login } = useUser();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -38,11 +40,13 @@ export const LoginForm = () => {
         throw new Error(data.message || 'Login failed. Please check your credentials.');
       }
 
-      if (data.token) {
-        localStorage.setItem('token', data.token);
+      if (data.token && data.user) {
+        // Save the context session
+        login(data.token, data.user);
+        router.push('/dashboard');
+      } else {
+        throw new Error('Invalid response from server.');
       }
-
-      router.push('/dashboard');
       
     } catch (err: any) {
       setError(err.message || 'An error occurred during login. The API endpoint might not be available yet.');
