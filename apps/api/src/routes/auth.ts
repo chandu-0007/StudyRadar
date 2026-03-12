@@ -10,8 +10,7 @@ const router = Router();
 const signupSchema = z.object({
   username: z.string().min(3, "Username must be at least 3 characters").max(30),
   email: z.string()
-    .email("Invalid email format")
-    .endsWith(".edu.in", "Email must be an academic .edu.in address"),
+    .email("Invalid email format"),
   password: z.string().min(6, "Password must be at least 6 characters"),
   college: z.string().min(2, "College name is required"),
   department: z.enum(["CSE", "ECE", "EEE", "MECH", "CIVIL", "IT"]),
