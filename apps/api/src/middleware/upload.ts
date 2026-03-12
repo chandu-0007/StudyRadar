@@ -10,12 +10,12 @@ const storage = new CloudinaryStorage({
     // Attempting to dynamically build the folder path from request body
     // Note: Multer streams the file before the body is fully parsed in some cases,
     // so we provide fallbacks just in case the body hasn't fully arrived.
-    const college = (req.body.college || "unknown-college").toLowerCase().replace(/\s+/g, '-');
     const department = (req.body.department || "unknown-dept").toLowerCase();
     const semester = (req.body.semester || "unknown-sem").toLowerCase();
+    const subject = (req.body.subjectId || "unknown-subject").toLowerCase();
     
-    // e.g. college-resources/cse/sem5/
-    const folderPath = `college-resources/${college}/${department}/${semester}`;
+    // college-resources/{department}/{semester}/{subject}
+    const folderPath = `college-resources/${department}/${semester}/${subject}`;
 
     return {
       folder: folderPath,

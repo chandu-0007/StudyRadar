@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 
+
 // Extend Express Request object to include the user payload
 export interface AuthRequest extends Request {
   user?: {
@@ -9,6 +10,8 @@ export interface AuthRequest extends Request {
     email: string;
     department: string;
   };
+  file?: any;
+  files?: any;
 }
 
 export const requireAuth = (req: AuthRequest, res: Response, next: NextFunction): void => {
@@ -20,12 +23,16 @@ export const requireAuth = (req: AuthRequest, res: Response, next: NextFunction)
   }
 
   const token = authHeader.split(" ")[1];
+  if (!token) {
+    res.status(401).json({ success: false, message: "Authentication required. Missing token." });
+    return;
+  }
 
   try {
-    const secret = process.env.JWT_SECRET;
+    const secret = process.env.JWT_SECRET || "";
     if (!secret) throw new Error("JWT_SECRET missing");
 
-    const decoded = jwt.verify(token, secret as string) as AuthRequest["user"];
+    const decoded = jwt.verify(token, secret) as AuthRequest["user"];
     req.user = decoded;
     next();
   } catch (error) {

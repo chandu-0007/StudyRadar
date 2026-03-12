@@ -13,8 +13,7 @@ datasource db {
 
 enum Role {
   STUDENT
-  SENIOR
-  MODERATOR
+  TEACHER
   ADMIN
 }
 

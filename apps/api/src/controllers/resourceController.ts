@@ -120,7 +120,7 @@ export class ResourceController {
       res.status(200).json({ success: true, message: "Resource flagged successfully." });
     } catch (error: any) {
       if (error.message === "UNAUTHORIZED") {
-        res.status(403).json({ success: false, message: "Only faculty and seniors can flag resources directly." });
+        res.status(403).json({ success: false, message: "Only teachers or admins can report resources directly." });
       } else {
          console.error("reportResource Error:", error);
          res.status(500).json({ success: false, message: "Internal server error" });
@@ -134,7 +134,7 @@ export class ResourceController {
       res.status(200).json({ success: true, message: "Resource approved successfully." });
     } catch (error: any) {
       if (error.message === "UNAUTHORIZED") {
-        res.status(403).json({ success: false, message: "Only faculty and seniors can approve resources." });
+        res.status(403).json({ success: false, message: "Only teachers or admins can approve resources." });
       } else {
          console.error("approveResource Error:", error);
          res.status(500).json({ success: false, message: "Internal server error" });

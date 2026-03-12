@@ -10,7 +10,7 @@ export class ResourceService {
     const uploader = await prisma.user.findUnique({ where: { id: userId } });
     if (!uploader) throw new Error("User not found.");
 
-    const isTeacherRole = ["SENIOR", "MODERATOR", "ADMIN"].includes(uploader.role);
+    const isTeacherRole = ["TEACHER", "ADMIN"].includes(uploader.role);
     const status = isTeacherRole ? "APPROVED" : "PENDING";
 
     try {
@@ -94,7 +94,7 @@ export class ResourceService {
     if (!resource) throw new Error("RESOURCE_NOT_FOUND");
 
     const isOwner = resource.userId === userPayload.userId;
-    const isTeacherOrAdmin = ["SENIOR", "MODERATOR", "ADMIN"].includes(userPayload.role);
+    const isTeacherOrAdmin = ["TEACHER", "ADMIN"].includes(userPayload.role);
 
     if (!isOwner && !isTeacherOrAdmin) {
       throw new Error("UNAUTHORIZED");
@@ -140,7 +140,7 @@ export class ResourceService {
   }
 
   static async reportResource(id: string, userPayload: any, reason: string) {
-    const canReport = ["SENIOR", "MODERATOR", "ADMIN"].includes(userPayload.role);
+    const canReport = ["TEACHER", "ADMIN"].includes(userPayload.role);
     if (!canReport) {
       throw new Error("UNAUTHORIZED");
     }
@@ -152,7 +152,7 @@ export class ResourceService {
   }
 
   static async approveResource(id: string, userPayload: any) {
-    const canApprove = ["SENIOR", "MODERATOR", "ADMIN"].includes(userPayload.role);
+    const canApprove = ["TEACHER", "ADMIN"].includes(userPayload.role);
     if (!canApprove) {
       throw new Error("UNAUTHORIZED");
     }
