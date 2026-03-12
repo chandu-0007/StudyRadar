@@ -1,2 +1,14 @@
 @import "tailwindcss";
 @source "../../packages/ui/src";
+
+/* Global custom scrollbar for the SaaS window UI */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 8px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent; 
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background-color: #cbd5e1; 
+  border-radius: 20px; 
+}
