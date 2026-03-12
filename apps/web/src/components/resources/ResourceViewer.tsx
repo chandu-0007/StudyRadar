@@ -5,6 +5,7 @@ import { useUser } from '../../context/UserContext';
 import { useParams, useRouter } from 'next/navigation';
 import { Download, AlertTriangle, ArrowLeft, Loader2, Star, CheckCircle, ExternalLink } from 'lucide-react';
 import { ResourceItem } from './ResourceCard';
+import { BookmarkButton } from '../bookmarks/BookmarkButton';
 
 export const ResourceViewer = () => {
   const { user } = useUser();
@@ -153,6 +154,7 @@ export const ResourceViewer = () => {
                 {isDownloading ? <Loader2 className="w-4 h-4 animate-spin"/> : <Download className="w-4 h-4" />}
                 Download
              </button>
+             <BookmarkButton resourceId={resource.id} />
              <button
                onClick={() => setShowReportDialog(true)}
                className="p-2 bg-white border border-gray-300 text-gray-600 hover:bg-red-50 hover:text-red-600 hover:border-red-200 rounded-lg shadow-sm transition"

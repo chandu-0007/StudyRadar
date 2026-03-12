@@ -64,6 +64,26 @@ export class ResourceController {
     }
   }
 
+  static async search(req: AuthRequest, res: Response): Promise<void> {
+    try {
+      const page = req.query.page ? parseInt(req.query.page as string) : 1;
+      const limit = req.query.limit ? parseInt(req.query.limit as string) : 10;
+      const q = (req.query.q as string) || '';
+      
+      const filters = {
+        semester: req.query.semester,
+        subjectId: req.query.subjectId,
+        unit: req.query.unit
+      };
+
+      const result = await ResourceService.searchResources(q, filters, page, limit);
+      res.status(200).json({ success: true, ...result });
+    } catch (error: any) {
+      console.error("search Error:", error);
+      res.status(500).json({ success: false, message: "Internal server error" });
+    }
+  }
+
   static async getResourceById(req: AuthRequest, res: Response): Promise<void> {
     try {
       const resource = await ResourceService.getResourceById(req.params.id as string);
