@@ -25,7 +25,7 @@ export const requireAuth = (req: AuthRequest, res: Response, next: NextFunction)
     const secret = process.env.JWT_SECRET;
     if (!secret) throw new Error("JWT_SECRET missing");
 
-    const decoded = jwt.verify(token, secret) as AuthRequest["user"];
+    const decoded = jwt.verify(token, secret as string) as AuthRequest["user"];
     req.user = decoded;
     next();
   } catch (error) {
