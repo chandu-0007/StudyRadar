@@ -1,0 +1,28 @@
+src/controllers/resourceController.ts(69,62): error TS2345: Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
+src/controllers/resourceController.ts(83,44): error TS2345: Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
+src/controllers/resourceController.ts(99,62): error TS2345: Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
+src/controllers/resourceController.ts(119,44): error TS2345: Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
+src/controllers/resourceController.ts(133,45): error TS2345: Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
+src/middleware/auth.ts(28,32): error TS2769: No overload matches this call.
+  The last overload gave the following error.
+    Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
+      Type 'undefined' is not assignable to type 'string'.
+src/middleware/resourceController.ts(4,38): error TS2307: Cannot find module '../validators/resourceValidator' or its corresponding type declarations.
+src/middleware/resourceController.ts(25,51): error TS2339: Property 'createResource' does not exist on type 'typeof import("C:/Users/chand/OneDrive/Documents/Projects/Hackthon-project/apps/api/src/services/resourceService")'.
+src/middleware/resourceController.ts(43,46): error TS2339: Property 'getResources' does not exist on type 'typeof import("C:/Users/chand/OneDrive/Documents/Projects/Hackthon-project/apps/api/src/services/resourceService")'.
+src/middleware/resourceController.ts(63,48): error TS2339: Property 'getResourceById' does not exist on type 'typeof import("C:/Users/chand/OneDrive/Documents/Projects/Hackthon-project/apps/api/src/services/resourceService")'.
+src/middleware/resourceController.ts(91,31): error TS2339: Property 'deleteResource' does not exist on type 'typeof import("C:/Users/chand/OneDrive/Documents/Projects/Hackthon-project/apps/api/src/services/resourceService")'.
+src/middleware/resourceController.ts(105,48): error TS2339: Property 'downloadResource' does not exist on type 'typeof import("C:/Users/chand/OneDrive/Documents/Projects/Hackthon-project/apps/api/src/services/resourceService")'.
+src/middleware/resourceController.ts(133,31): error TS2339: Property 'reportResource' does not exist on type 'typeof import("C:/Users/chand/OneDrive/Documents/Projects/Hackthon-project/apps/api/src/services/resourceService")'.
+src/middleware/resourceController.ts(158,31): error TS2339: Property 'approveResource' does not exist on type 'typeof import("C:/Users/chand/OneDrive/Documents/Projects/Hackthon-project/apps/api/src/services/resourceService")'.
+src/middleware/resourceService.ts(4,38): error TS2307: Cannot find module '../validators/resourceValidator' or its corresponding type declarations.
+src/middleware/resourceService.ts(21,26): error TS2694: Namespace '"C:/Users/chand/OneDrive/Documents/Projects/Hackthon-project/apps/api/node_modules/.prisma/client/index".Prisma' has no exported member 'FileType'.
+src/middleware/resourceService.ts(68,44): error TS2694: Namespace '"C:/Users/chand/OneDrive/Documents/Projects/Hackthon-project/apps/api/node_modules/.prisma/client/index".Prisma' has no exported member 'ResourceStatus'.
+src/middleware/resourceService.ts(71,61): error TS2694: Namespace '"C:/Users/chand/OneDrive/Documents/Projects/Hackthon-project/apps/api/node_modules/.prisma/client/index".Prisma' has no exported member 'Department'.
+src/middleware/resourceService.ts(72,55): error TS2694: Namespace '"C:/Users/chand/OneDrive/Documents/Projects/Hackthon-project/apps/api/node_modules/.prisma/client/index".Prisma' has no exported member 'Semester'.
+src/middleware/resourceService.ts(74,43): error TS2694: Namespace '"C:/Users/chand/OneDrive/Documents/Projects/Hackthon-project/apps/api/node_modules/.prisma/client/index".Prisma' has no exported member 'ResourceType'.

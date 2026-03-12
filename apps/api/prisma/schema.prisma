@@ -58,6 +58,11 @@ enum FileType {
   LINK
 }
 
+enum ExamType {
+  MID_SEM
+  END_SEM
+}
+
 enum ResourceStatus {
   PENDING
   APPROVED
@@ -154,6 +159,7 @@ model Resource {
   description String?
 
   fileUrl  String
+  publicId String
   fileType FileType
   mimeType String?
   fileSize Int? // bytes
@@ -167,6 +173,8 @@ model Resource {
   department Department
   unit       Int?
   year       Int?
+  examYear   Int?
+  examType   ExamType?
 
   syllabusMatch Boolean @default(true)
 
