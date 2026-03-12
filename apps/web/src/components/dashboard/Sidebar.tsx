@@ -9,7 +9,8 @@ import {
   Files, 
   Bookmark, 
   User,
-  BarChart3
+  BarChart3,
+  Sparkles
 } from 'lucide-react';
 import { SidebarSection } from './SidebarSection';
 import { SidebarItem } from './SidebarItem';
@@ -26,6 +27,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ role }) => {
           <SidebarItem href="/dashboard" label="Dashboard" icon={Home} />
           {role === 'STUDENT' && (
             <>
+              <SidebarItem href="/dashboard/study-mode" label="Study Mode" icon={Sparkles} />
               <SidebarItem href="/dashboard/explore" label="Explore Resources" icon={Compass} />
               <SidebarItem href="/dashboard/subjects" label="Subjects" icon={BookOpen} />
             </>

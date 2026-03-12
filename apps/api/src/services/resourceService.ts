@@ -77,6 +77,63 @@ export class ResourceService {
     return { resources, total, page, totalPages: Math.ceil(total / limit) };
   }
 
+  static async searchResources(q: string, filters: any, page: number = 1, limit: number = 10) {
+    const skip = (page - 1) * limit;
+
+    const where: any = { status: 'APPROVED' };
+    
+    if (q) {
+      where.OR = [
+        { title: { contains: q, mode: 'insensitive' } },
+        { description: { contains: q, mode: 'insensitive' } },
+        { subject: { name: { contains: q, mode: 'insensitive' } } },
+        { subject: { code: { contains: q, mode: 'insensitive' } } },
+      ];
+      
+      const unitMatch = q.match(/unit\s*(\d+)/i);
+      if (unitMatch && unitMatch[1]) {
+         where.OR.push({ unit: parseInt(unitMatch[1] as string) });
+      }
+    }
+
+    if (filters.semester) where.semester = filters.semester;
+    if (filters.subjectId) where.subjectId = filters.subjectId;
+    if (filters.unit) where.unit = parseInt(filters.unit);
+
+    const [resources, total] = await Promise.all([
+      prisma.resource.findMany({
+        where,
+        skip,
+        take: limit,
+        orderBy: [
+          { avgRating: 'desc' },
+          { downloadCount: 'desc' },
+          { createdAt: 'desc' }
+        ],
+        include: {
+          subject: { select: { name: true, code: true } },
+          uploadedBy: { select: { username: true, role: true } }
+        }
+      }),
+      prisma.resource.count({ where })
+    ]);
+    
+    // Custom sort to prioritize teacher uploads on the current page 
+    // Prisma doesn't natively sort by a joined table's constant value easily without raw queries.
+    const sorted = [...resources].sort((a, b) => {
+       const aRole = a.uploadedBy.role as string;
+       const bRole = b.uploadedBy.role as string;
+       const aIsTeacher = (aRole === 'TEACHER' || aRole === 'ADMIN') ? 1 : 0;
+       const bIsTeacher = (bRole === 'TEACHER' || bRole === 'ADMIN') ? 1 : 0;
+       if (aIsTeacher !== bIsTeacher) {
+          return bIsTeacher - aIsTeacher;
+       }
+       return 0; // retain original rating/download sort
+    });
+
+    return { resources: sorted, total, page, totalPages: Math.ceil(total / limit) };
+  }
+
   static async getResourceById(id: string) {
     return prisma.resource.findUnique({
       where: { id },
