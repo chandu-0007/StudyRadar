@@ -12,15 +12,15 @@ export const resourceUploadSchema = z.object({
   syllabusMatch: z.enum(["true", "false"]).optional(),
   
   // Specific to PAST_PAPER
-  examYear: z.string().optional(),
+  examDate: z.string().optional(),
   examType: z.enum(["MID_SEM", "END_SEM"]).optional()
 }).refine(data => {
   if (data.type === "PAST_PAPER") {
-    return data.examYear !== undefined && data.examType !== undefined;
+    return data.examDate !== undefined && data.examType !== undefined;
   }
   return true;
 }, {
-  message: "examYear and examType are required when type is PAST_PAPER",
+  message: "examDate and examType are required when type is PAST_PAPER",
   path: ["examType"],
 });
 

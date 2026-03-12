@@ -1,5 +1,6 @@
 import prisma from "../prisma";
 import cloudinary from "../config/cloudinary";
+import { any } from "zod";
 
 export class ResourceService {
   /**
@@ -25,7 +26,7 @@ export class ResourceService {
           unit: data.unit && data.unit !== "All" ? parseInt(data.unit) : null,
           year: data.year ? parseInt(data.year) : null,
           
-          examYear: data.examYear ? parseInt(data.examYear) : null,
+          examDate : data.examDate ||null ,
           examType: data.examType as any,
           
           syllabusMatch: data.syllabusMatch === "false" ? false : true,

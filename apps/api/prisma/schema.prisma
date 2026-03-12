@@ -172,7 +172,7 @@ model Resource {
   department Department
   unit       Int?
   year       Int?
-  examYear   Int?
+  examDate   String?
   examType   ExamType?
 
   syllabusMatch Boolean @default(true)
