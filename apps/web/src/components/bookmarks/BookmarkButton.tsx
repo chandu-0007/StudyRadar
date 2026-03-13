@@ -16,7 +16,8 @@ export const BookmarkButton: React.FC<BookmarkButtonProps> = ({ resourceId }) =>
     const checkStatus = async () => {
       try {
         const token = localStorage.getItem('token');
-        const res = await fetch(`http://localhost:5000/api/resources/${resourceId}/bookmark-status`, {
+        const apiBase = process.env.NEXT_PUBLIC_API || "http://localhost:5000";
+        const res = await fetch(`${apiBase}/api/resources/${resourceId}/bookmark-status`, {
           headers: {
             'Authorization': `Bearer ${token}`
           }
@@ -39,7 +40,8 @@ export const BookmarkButton: React.FC<BookmarkButtonProps> = ({ resourceId }) =>
     try {
       const token = localStorage.getItem('token');
       const method = isBookmarked ? 'DELETE' : 'POST';
-      const endpoint = `http://localhost:5000/api/resources/${resourceId}/bookmark`;
+      const apiBase = process.env.NEXT_PUBLIC_API || "http://localhost:5000";
+      const endpoint = `${apiBase}/api/resources/${resourceId}/bookmark`;
       
       const res = await fetch(endpoint, {
         method,

@@ -64,8 +64,7 @@ export class BookmarkController {
          return;
       }
 
-      const bookmarks = await BookmarkService.getUserBookmarks(userId);
-      const isBookmarked = bookmarks.some(b => b.resourceId === resourceId);
+      const isBookmarked = await BookmarkService.isBookmarked(userId, resourceId);
 
       res.status(200).json({ success: true, isBookmarked });
     } catch (error: any) {

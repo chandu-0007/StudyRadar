@@ -9,10 +9,12 @@ import { Loader2 } from 'lucide-react';
 export const ResourceFeed = ({ 
   initialSubjectId, 
   initialStatus,
+  initialSemester,
   hideGlobalFilters = false
 }: { 
   initialSubjectId?: string; 
   initialStatus?: string;
+  initialSemester?: string;
   hideGlobalFilters?: boolean;
 }) => {
   const { user } = useUser();
@@ -22,7 +24,9 @@ export const ResourceFeed = ({
   
   const [filters, setFilters] = useState({
     department: '',
-    semester: '',
+    // For subject-specific views, we rely primarily on subjectId.
+    // Semester can still be set via filters UI in explorer.
+    semester: initialSemester || '',
     type: '',
     status: initialStatus !== undefined ? initialStatus : (user?.role === 'TEACHER' ? '' : 'APPROVED'), // students only see APPROVED by default
     subjectId: initialSubjectId || ''
@@ -51,7 +55,8 @@ export const ResourceFeed = ({
         ...(filters.status && { status: filters.status }),
       });
 
-      const response = await fetch(`http://localhost:5000/api/resources?${queryParams.toString()}`, {
+      const apiBase = process.env.NEXT_PUBLIC_API || "http://localhost:5000";
+      const response = await fetch(`${apiBase}/api/resources?${queryParams.toString()}`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }

@@ -1,9 +1,11 @@
 import { Router } from "express";
-import { PrismaClient } from "@prisma/client";
+import prisma from "../prisma";
 import { requireAuth, AuthRequest } from "../middleware/auth";
 
 const router = Router();
-const prisma = new PrismaClient();
+
+const SEMESTERS = new Set(["SEM1", "SEM2", "SEM3", "SEM4", "SEM5", "SEM6", "SEM7", "SEM8"]);
+const DEPARTMENTS = new Set(["CSE", "ECE", "EEE", "MECH", "CIVIL", "IT"]);
 
 // GET /api/subjects
 router.get("/", async (req, res) => {
@@ -11,12 +13,25 @@ router.get("/", async (req, res) => {
     const { semester, department } = req.query;
 
     const where: any = {};
-    if (semester) where.semester = semester as string;
-    if (department) where.department = department as string;
+    if (semester) {
+      const sem = String(semester).toUpperCase();
+      if (!SEMESTERS.has(sem)) {
+        return res.status(400).json({ success: false, message: "Invalid semester." });
+      }
+      where.semester = sem;
+    }
+    if (department) {
+      const dept = String(department).toUpperCase();
+      if (!DEPARTMENTS.has(dept)) {
+        return res.status(400).json({ success: false, message: "Invalid department." });
+      }
+      where.department = dept;
+    }
 
     let subjects = await prisma.subject.findMany({
       where,
-      orderBy: { code: 'asc' }
+      orderBy: { code: "asc" },
+      include: { _count: { select: { resources: true } } },
     });
 
     // If no subjects exist at all, seed a few default subjects so the frontend doesn't break
@@ -34,7 +49,8 @@ router.get("/", async (req, res) => {
       });
       subjects = await prisma.subject.findMany({
         where,
-        orderBy: { code: 'asc' }
+        orderBy: { code: "asc" },
+        include: { _count: { select: { resources: true } } },
       });
     }
 
@@ -45,11 +61,27 @@ router.get("/", async (req, res) => {
   }
 });
 
+// GET /api/subjects/:id (Fetch specific subject details)
+router.get("/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const subject = await prisma.subject.findUnique({
+      where: { id },
+      include: { _count: { select: { resources: true } } }
+    });
+    if (!subject) return res.status(404).json({ success: false, message: "Subject not found" });
+    res.status(200).json({ success: true, subject });
+  } catch (error) {
+    console.error("Fetch Subject Error:", error);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+});
+
 // POST /api/subjects
 router.post("/", requireAuth, async (req: AuthRequest, res) => {
   try {
     const { name, code, semester, department } = req.body;
-    
+
     // Check if user is teacher or admin
     if (!req.user || !["TEACHER", "ADMIN"].includes(req.user.role)) {
       return res.status(403).json({ success: false, message: "Unauthorized. Teachers only." });

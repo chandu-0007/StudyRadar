@@ -27,6 +27,54 @@ export const ProfileDetailsForm: React.FC<ProfileDetailsFormProps> = ({
       </div>
 
       <div className="space-y-4">
+        {data.role === 'teacher' && (
+          <>
+            <Input
+              label="Full Name (as per staff records)"
+              type="text"
+              placeholder="e.g. Dr. Sharma"
+              value={data.name || ''}
+              onChange={(e) => updateData({ name: e.target.value })}
+              required
+            />
+
+            <Input
+              label="Employee ID"
+              type="text"
+              placeholder="e.g. TCH2024001"
+              value={data.employeeId || ''}
+              onChange={(e) => updateData({ employeeId: e.target.value })}
+              required
+            />
+
+            <Input
+              label="Designation"
+              type="text"
+              placeholder="e.g. Assistant Professor"
+              value={data.designation || ''}
+              onChange={(e) => updateData({ designation: e.target.value })}
+              required
+            />
+
+            <div className="flex flex-col w-full text-left">
+              <label className="text-sm font-medium text-gray-700 mb-1">Upload ID Card Image</label>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={(e) => {
+                  const file = e.target.files?.[0] || null;
+                  updateData({ idCardImage: file });
+                }}
+                className="px-4 py-2 text-gray-900 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-shadow bg-white"
+                required
+              />
+              {data.idCardImage?.name && (
+                <p className="text-xs text-gray-500 mt-1">Selected: {data.idCardImage.name}</p>
+              )}
+            </div>
+          </>
+        )}
+
         {data.role === 'student' && (
           <Input
             label="Graduation Year (Optional)"

@@ -1,6 +1,18 @@
 import prisma from "../prisma";
 
 export class BookmarkService {
+  static async isBookmarked(userId: string, resourceId: string) {
+    const existing = await prisma.bookmark.findUnique({
+      where: {
+        userId_resourceId: {
+          userId,
+          resourceId,
+        },
+      },
+    });
+    return Boolean(existing);
+  }
+
   static async addBookmark(userId: string, resourceId: string) {
     // Check if resource exists
     const resource = await prisma.resource.findUnique({ where: { id: resourceId } });

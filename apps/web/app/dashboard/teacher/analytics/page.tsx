@@ -81,7 +81,7 @@ export default function TeacherAnalyticsPage() {
         </div>
       ) : error ? (
         <div className="bg-red-50 text-red-700 p-6 border border-red-200 rounded-xl mb-6 flex items-center gap-3 shadow-sm">
-          <AlertTriangle className="w-6 h-6 flex-shrink-0" />
+          <AlertTriangle className="w-6 h-6 shrink-0" />
           <span className="font-medium text-sm">Error Loading Analytics: {error}</span>
         </div>
       ) : data ? (

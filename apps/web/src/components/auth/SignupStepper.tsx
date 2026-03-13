@@ -28,6 +28,11 @@ export const SignupStepper = () => {
     github: '',
     bio: '',
     profileImage: '',
+    // Teacher verification fields
+    name: '',
+    employeeId: '',
+    designation: '',
+    idCardImage: null as File | null,
   });
 
   const updateFormData = (newData: any) => {
@@ -42,27 +47,60 @@ export const SignupStepper = () => {
     setApiError('');
 
     try {
-      // Clean up payload before sending
-      const payload = {
-        role: formData.role.toUpperCase(),
-        college: formData.college,
-        department: formData.department.toUpperCase(),
-        currentSem: formData.role === 'student' ? formData.semester : 'SEM1',
-        username: formData.username,
-        email: formData.email,
-        password: formData.password,
-        graduationYear: formData.graduationYear ? parseInt(formData.graduationYear) : new Date().getFullYear(),
-        linkedin: formData.linkedin || undefined,
-        github: formData.github || undefined,
-        bio: formData.bio || undefined,
-      };
+      const apiBase = process.env.NEXT_PUBLIC_API || 'http://localhost:5000';
 
-      const response = await fetch('http://localhost:5000/api/auth/signup', {
+      if (formData.role === 'student') {
+        const payload = {
+          username: formData.username,
+          email: formData.email,
+          password: formData.password,
+          college: formData.college,
+          department: formData.department.toUpperCase(),
+          currentSem: formData.semester,
+          graduationYear: formData.graduationYear
+            ? parseInt(formData.graduationYear)
+            : new Date().getFullYear(),
+        };
+
+        const response = await fetch(`${apiBase}/api/auth/student/register`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.message || 'Signup failed. Please check your data.');
+        }
+
+        if (data.token && data.user) {
+          localStorage.setItem('token', data.token);
+          localStorage.setItem('user', JSON.stringify(data.user));
+          router.push('/dashboard');
+        } else {
+          router.push('/login');
+        }
+        return;
+      }
+
+      // TEACHER REGISTER (multipart + idCardImage)
+      const teacherForm = new FormData();
+      teacherForm.append('username', formData.username);
+      teacherForm.append('email', formData.email);
+      teacherForm.append('password', formData.password);
+      teacherForm.append('college', formData.college);
+      teacherForm.append('department', formData.department.toUpperCase());
+      teacherForm.append('employeeId', formData.employeeId);
+      teacherForm.append('designation', formData.designation);
+      teacherForm.append('name', formData.name || formData.username);
+      if (formData.idCardImage) {
+        teacherForm.append('idCardImage', formData.idCardImage);
+      }
+
+      const response = await fetch(`${apiBase}/api/auth/teacher/register`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(payload),
+        body: teacherForm,
       });
 
       const data = await response.json();
@@ -71,15 +109,12 @@ export const SignupStepper = () => {
         throw new Error(data.message || 'Signup failed. Please check your data.');
       }
 
+      // Teacher path: backend returns token + user when auto-approved
       if (data.token && data.user) {
-        // Technically signup backend logic doesn't return a token right now,
-        // but if it ever does, this handles it.
         localStorage.setItem('token', data.token);
         localStorage.setItem('user', JSON.stringify(data.user));
         router.push('/dashboard');
       } else {
-        // Since no token is provided after signup in the current backend API, 
-        // cleanly push them back to the login screen to perform a real authentication!
         router.push('/login');
       }
     } catch (err: any) {

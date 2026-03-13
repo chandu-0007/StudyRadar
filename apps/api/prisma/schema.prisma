@@ -22,6 +22,10 @@ model User {
   github         String?
   role           Role              @default(STUDENT)
   verified       Boolean           @default(false)
+  status         UserStatus        @default(PENDING)
+  employeeId     String?
+  designation    String?
+  idCardImage    String?
   reputation     Int               @default(0)
   uploadsCount   Int               @default(0)
   isSenior       Boolean           @default(false)
@@ -41,6 +45,17 @@ model User {
 
   @@index([college])
   @@index([department])
+}
+
+model StaffRecord {
+  id           String @id @default(uuid())
+  employeeId   String @unique
+  name         String
+  email        String
+  department   String
+  designation  String
+  college      String
+  isActive     Boolean @default(true)
 }
 
 model Subject {
@@ -69,6 +84,7 @@ model Resource {
   type          ResourceType
   semester      Semester
   department    Department
+  isTeacherUpload Boolean         @default(false)
   unit          Int?
   year          Int?
   syllabusMatch Boolean           @default(true)
@@ -191,6 +207,12 @@ enum Role {
   STUDENT
   TEACHER
   ADMIN
+}
+
+enum UserStatus {
+  PENDING
+  APPROVED
+  REJECTED
 }
 
 enum Department {

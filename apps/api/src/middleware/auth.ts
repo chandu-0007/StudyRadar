@@ -9,6 +9,10 @@ export interface AuthRequest extends Request {
     role: string;
     email: string;
     department: string;
+    college?: string;
+    currentSem?: string;
+    verified?: boolean;
+    status?: string;
   };
   file?: any;
   files?: any;
@@ -40,3 +44,32 @@ export const requireAuth = (req: AuthRequest, res: Response, next: NextFunction)
     return;
   }
 };
+
+export const requireAdmin = (req: AuthRequest, res: Response, next: NextFunction): void => {
+  if (!req.user || req.user.role !== "ADMIN") {
+    res.status(403).json({ success: false, message: "Admin access required." });
+    return;
+  }
+  next();
+};
+
+export const requireTeacher = (req: AuthRequest, res: Response, next: NextFunction): void => {
+  if (!req.user || req.user.role !== "TEACHER") {
+    res.status(403).json({ success: false, message: "Teacher access required." });
+    return;
+  }
+  next();
+};
+
+export const requireVerifiedTeacher = (req: AuthRequest, res: Response, next: NextFunction): void => {
+  if (!req.user || req.user.role !== "TEACHER") {
+    res.status(403).json({ success: false, message: "Teacher access required." });
+    return;
+  }
+  if (req.user.status !== "APPROVED" && req.user.verified !== true) {
+    res.status(403).json({ success: false, message: "Teacher account is not verified." });
+    return;
+  }
+  next();
+};
+

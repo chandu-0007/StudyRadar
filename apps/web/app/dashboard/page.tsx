@@ -102,7 +102,7 @@ export default function DashboardHomePage() {
 
           {/* RIGHT SIDEBAR PANEL */}
           <div className="space-y-6">
-            <div className="bg-gradient-to-br from-indigo-900 to-indigo-800 rounded-2xl p-6 text-white shadow-md">
+            <div className="bg-linear-to-br from-indigo-900 to-indigo-800 rounded-2xl p-6 text-white shadow-md">
               <h3 className="text-lg font-bold mb-2">Subject Management</h3>
               <p className="text-indigo-100/80 text-sm mb-6">Create new curriculum subjects and define the target semester for your students.</p>
               <Link href="/dashboard/admin/subjects">
@@ -137,6 +137,17 @@ export default function DashboardHomePage() {
                     </div>
                   </div>
                 </Link>
+                 <Link href="/dashboard/chat">
+                  <div className="p-3 border border-gray-100 rounded-xl hover:bg-gray-50 transition-colors cursor-pointer flex items-center gap-3">
+                    <div className="p-2 bg-indigo-50 text-indigo-600 rounded-lg">
+                      <BarChart3 className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-semibold text-gray-900">Collaboration</p>
+                      <p className="text-xs text-gray-500">Share files with your class</p>
+                    </div>
+                  </div>
+                </Link>
               </div>
             </div>
           </div>
@@ -149,7 +160,7 @@ export default function DashboardHomePage() {
   // DEFAULT STUDENT VIEW
   return (
     <div className="max-w-5xl mx-auto mt-10">
-      <div className="bg-gradient-to-r from-indigo-600 to-violet-600 rounded-2xl p-10 text-white shadow-lg overflow-hidden relative">
+      <div className="bg-linear-to-r from-indigo-600 to-violet-600 rounded-2xl p-10 text-white shadow-lg overflow-hidden relative">
         <div className="relative z-10">
           <h1 className="text-3xl font-bold mb-3">Welcome to {user.college}, {user.username}!</h1>
           <p className="text-indigo-100 max-w-lg mb-8">Access thousands of past papers, notes, and direct study materials uploaded by seniors and approved by your teachers.</p>

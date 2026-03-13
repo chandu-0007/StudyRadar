@@ -1,112 +1,86 @@
-import { Server, Socket } from 'socket.io';
-import { Server as HttpServer } from 'http';
-import prisma from './prisma';
-
-interface ServerToClientEvents {
-    'receive-message': (message: any) => void;
-    'error': (error: { message: string }) => void;
-}
-
-interface ClientToServerEvents {
-    'join-room': (roomId: string) => void;
-    'send-message': (data: { roomId: string; text?: string; imageUrl?: string; userId: string }) => void;
-}
-
-interface InterServerEvents {
-    // Internal events if needed
-}
-
-interface SocketData {
-    userId?: string;
-}
+import { Server } from "socket.io";
+import { Server as HttpServer } from "http";
+import jwt from "jsonwebtoken";
 
 let io: Server | undefined;
 
+// store connected users
+const onlineUsers: string[] = [];
+
 export const initializeSocket = (httpServer: HttpServer) => {
-    io = new Server<ClientToServerEvents, ServerToClientEvents, InterServerEvents, SocketData>(httpServer, {
-        cors: {
-            origin: "*", // TODO: Restrict this to your frontend URL in production
-            methods: ["GET", "POST"]
-        }
+  io = new Server(httpServer, {
+    cors: {
+      origin: "http://localhost:3000",
+      methods: ["GET", "POST"],
+    },
+  });
+
+  // JWT AUTH
+  io.use((socket, next) => {
+    const token = socket.handshake.auth?.token;
+
+    if (!token) return next(new Error("Unauthorized"));
+
+    try {
+      jwt.verify(token, process.env.JWT_SECRET!);
+      next();
+    } catch {
+      next(new Error("Invalid token"));
+    }
+  });
+
+  io.on("connection", (socket) => {
+    console.log("User connected:", socket.id);
+
+    onlineUsers.push(socket.id);
+
+    const ROOM_NAME = "global-room";
+
+    // JOIN ROOM
+    socket.on("join-room", (username: string) => {
+      socket.join(ROOM_NAME);
+
+      socket.emit("join-success", {
+        message: "Joined successfully",
+        room: ROOM_NAME,
+      });
+
+      io?.to(ROOM_NAME).emit("user-joined", {
+        message: `${username} joined the chat`,
+      });
     });
 
-    io.on('connection', (socket: Socket) => {
-        console.log(`User connected: ${socket.id}`);
+    // SEND MESSAGE
+    socket.on(
+      "send-message",
+      (data: { username: string; text: string }) => {
+        const { username, text } = data;
 
-        // 1. Join Room & Fetch History
-        socket.on('join-room', async (roomId: string) => {
-            try {
-                socket.join(roomId);
-                console.log(`Socket ${socket.id} joined room ${roomId}`);
+        if (!text) return;
 
-                // Fetch last 20 messages efficiently using the new compound index
-                const messages = await prisma.message.findMany({
-                    where: { roomId },
-                    take: 20,
-                    orderBy: { createdAt: 'desc' },
-                    include: {
-                        user: {
-                            select: { id: true, username: true, profileImage: true }
-                        }
-                    }
-                });
-
-                // Send messages back to the user who just joined (reversed to show oldest first in chat UI)
-                socket.emit('room-history', messages.reverse() as any); // Send explicit history event
-            } catch (error) {
-                console.error('Error joining room:', error);
-                socket.emit('error', { message: 'Failed to join room and load messages' });
-            }
+        io?.to(ROOM_NAME).emit("receive-message", {
+          user: username,
+          text,
         });
+      }
+    );
 
-        // 2. Send Message
-        socket.on('send-message', async (data) => {
-            const { roomId, text, imageUrl, userId } = data;
+    socket.on("disconnect", () => {
+      console.log("User disconnected:", socket.id);
 
-            // Basic validation
-            if (!roomId || (!text && !imageUrl) || !userId) {
-                return socket.emit('error', { message: 'Invalid payload' });
-            }
+      const index = onlineUsers.indexOf(socket.id);
+      if (index > -1) onlineUsers.splice(index, 1);
 
-            try {
-                // Save to Prisma
-                const savedMessage = await prisma.message.create({
-                    data: {
-                        text,
-                        imageUrl,
-                        roomId,
-                        userId,
-                    },
-                    include: {
-                        user: {
-                            select: { id: true, username: true, profileImage: true }
-                        }
-                    }
-                });
-
-                // Broadcast to everyone in the room (including sender)
-                // Engineering Decision: Broadcasting allows for optimistic UI updates on client
-                // or simply confirming the server received it.
-                if (!io) throw new Error('Socket.io not initialized');
-                io.to(roomId).emit('receive-message', savedMessage);
-
-            } catch (error) {
-                console.error('Error sending message:', error);
-                socket.emit('error', { message: 'Failed to send message' });
-            }
-        });
-
-        socket.on('disconnect', () => {
-            console.log(`User disconnected: ${socket.id}`);
-        });
+      io?.to(ROOM_NAME).emit("user-left", {
+        message: `A user left the chat`,
+      });
     });
+  });
 
-    return io;
+  return io;
 };
 
 export const getIO = () => {
-    if (!io) {
-        throw new Error("Socket.io not initialized!");
-    }
-    return io;
+  if (!io) throw new Error("Socket not initialized");
+  return io;
 };

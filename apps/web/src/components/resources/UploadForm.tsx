@@ -39,11 +39,11 @@ export const UploadForm = () => {
       try {
         if (!formData.semester) return;
         
-        // Pass semester and department context so student only sees their relevant courses 
-        // Note: For full restriction, we can pull user's department from UserContext
-        const dept = user?.department || 'CSE';
-        
-        const response = await fetch(`http://localhost:5000/api/subjects?semester=${formData.semester}&department=${dept}`);
+        // For now, fetch subjects by semester only so students always
+        // see all subjects available for that semester from the database.
+        const apiBase = process.env.NEXT_PUBLIC_API || "http://localhost:5000";
+        const query = new URLSearchParams({ semester: formData.semester }).toString();
+        const response = await fetch(`${apiBase}/api/subjects?${query}`);
         const data = await response.json();
         
         if (data.success && data.subjects) {
@@ -64,6 +64,8 @@ export const UploadForm = () => {
       }
     };
     fetchSubjects();
+  // Keep dependency shape stable (semester + department) to avoid dev warnings
+  // while only actually querying by semester in the API.
   }, [formData.semester, user?.department]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
@@ -110,7 +112,8 @@ export const UploadForm = () => {
       }
 
       const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:5000/api/resources/upload', {
+      const apiBase = process.env.NEXT_PUBLIC_API || "http://localhost:5000";
+      const response = await fetch(`${apiBase}/api/resources/upload`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`

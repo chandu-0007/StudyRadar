@@ -14,24 +14,21 @@ interface SubjectDetails {
   department: string;
 }
 
-export default function SubjectDetailsPage({ params }: { params: Promise<{ subjectId: string }> }) {
-  const { subjectId } = React.use(params);
+export default function SubjectDetailsPage({ params }: { params: { subjectId: string } }) {
+  const { subjectId } = params;
   const { user } = useUser();
   const [subject, setSubject] = useState<SubjectDetails | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // In a real app we'd fetch precise subject details from a GET /api/subjects/:id
-    // But since we only have a list fetch, we can just do a quick manual filter 
-    // or just render the feed with the ID!
     const fetchSubjectDetails = async () => {
       try {
-        const dept = user?.department || 'CSE';
-        const response = await fetch(`http://localhost:5000/api/subjects?department=${dept}`);
+        // Fetch precise subject details via ID
+        const apiBase = process.env.NEXT_PUBLIC_API || "http://localhost:5000";
+        const response = await fetch(`${apiBase}/api/subjects/${subjectId}`);
         const data = await response.json();
-        if (data.success && data.subjects) {
-          const found = data.subjects.find((s: SubjectDetails) => s.id === subjectId);
-          if (found) setSubject(found);
+        if (data.success && data.subject) {
+          setSubject(data.subject);
         }
       } catch (err) {
         console.error(err);
@@ -39,9 +36,9 @@ export default function SubjectDetailsPage({ params }: { params: Promise<{ subje
         setIsLoading(false);
       }
     };
-    
+
     fetchSubjectDetails();
-  }, [subjectId, user]);
+  }, [subjectId]);
 
   if (!user) return null;
 
@@ -81,8 +78,12 @@ export default function SubjectDetailsPage({ params }: { params: Promise<{ subje
         </div>
       )}
 
-      {/* Render the generic ResourceFeed locked specifically to this subjectId! */}
-      <ResourceFeed key={subjectId} initialSubjectId={subjectId} hideGlobalFilters={true} />
+      {/* Render the generic ResourceFeed locked specifically to this subjectId */}
+      <ResourceFeed 
+        key={subjectId} 
+        initialSubjectId={subjectId} 
+        hideGlobalFilters={true} 
+      />
     </div>
   );
 }

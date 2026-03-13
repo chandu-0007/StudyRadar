@@ -16,8 +16,9 @@ export default function BookmarksPage() {
     try {
       setIsLoading(true);
       const token = localStorage.getItem('token');
+      const apiBase = process.env.NEXT_PUBLIC_API || "http://localhost:5000";
       
-      const response = await fetch(`http://localhost:5000/api/bookmarks`, {
+      const response = await fetch(`${apiBase}/api/bookmarks`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -46,7 +47,8 @@ export default function BookmarksPage() {
   const handleDownload = async (id: string) => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:5000/api/resources/${id}/download`, {
+      const apiBase = process.env.NEXT_PUBLIC_API || "http://localhost:5000";
+      const response = await fetch(`${apiBase}/api/resources/${id}/download`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -63,7 +65,8 @@ export default function BookmarksPage() {
   const handleRemoveBookmark = async (resourceId: string) => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:5000/api/resources/${resourceId}/bookmark`, {
+      const apiBase = process.env.NEXT_PUBLIC_API || "http://localhost:5000";
+      const response = await fetch(`${apiBase}/api/resources/${resourceId}/bookmark`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`

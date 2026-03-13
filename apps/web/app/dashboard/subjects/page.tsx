@@ -21,13 +21,24 @@ export default function SubjectsPage() {
   // Default to student's current sem or SEM1
   const [selectedSemester, setSelectedSemester] = useState<string>((user as any)?.currentSem || 'SEM1');
 
+  // When user loads/changes, align the default semester to their profile
+  useEffect(() => {
+    const userSem = (user as any)?.currentSem as string | undefined;
+    if (userSem && userSem !== selectedSemester) {
+      setSelectedSemester(userSem);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id]);
+
   useEffect(() => {
     const fetchSubjects = async () => {
       setIsLoading(true);
       setError('');
       try {
         const dept = user?.department || 'CSE';
-        const response = await fetch(`http://localhost:5000/api/subjects?semester=${selectedSemester}&department=${dept}`);
+        const apiBase = process.env.NEXT_PUBLIC_API || "http://localhost:5000";
+        const query = new URLSearchParams({ semester: selectedSemester, department: dept }).toString();
+        const response = await fetch(`${apiBase}/api/subjects?${query}`);
         const data = await response.json();
         
         if (data.success && data.subjects) {
