@@ -160,7 +160,7 @@ AI Integration
 ---
 ##Prototype 
 ![alt text](<Screenshot (12).png>)
-![alt text](<Screenshot (12)-1.png>)
+![alt text](<Screenshot (11).png>)
 ![alt text](image.png)
 ![alt text](<Screenshot (7).png>)
 ![alt text](<Screenshot (8).png>)
